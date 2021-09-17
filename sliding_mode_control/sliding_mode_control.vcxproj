@@ -123,6 +123,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="coordinate.cpp" />
+    <ClCompile Include="function.cpp" />
+    <ClCompile Include="quadrotor.cpp" />
+    <ClCompile Include="sliding_mode_control.cpp" />
+    <ClCompile Include="target.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="coordinate.h" />
+    <ClInclude Include="function.h" />
+    <ClInclude Include="quadrotor.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="target.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sliding_mode_control.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
