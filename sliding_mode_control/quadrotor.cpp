@@ -138,7 +138,6 @@ void Quadrotor::updateAcc(Quadrotor* quad, int num) {
 	if (abs(ACCELERATION) >  g) {
 		ACCELERATION = ACCELERATION > 0 ? g : -g;
 	}
-
 	//≥‚¡¶≥Õ∑£
 	ACC_RUPLSION.x = ACC_RUPLSION.y = 0;
 	for (int i = 0; i < num; i++) {
