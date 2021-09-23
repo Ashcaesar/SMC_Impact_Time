@@ -25,7 +25,7 @@ private:
 	double THETA_d;
 	double e_THETA;
 	double Tgo;
-	double Td;
+	double T_d;
 	double RANGE;
 	double S1;
 	double S2;
@@ -46,11 +46,14 @@ public:
 	double getVelocity(void) const;
 	coordinate getAcc(void) const;
 	pair<double,double> getAccleration(void) const;
+	double getTgo(void) const;
+	double getTd(void) const;
 
 	//public set function
-	void setIndex(const int& x);
-	void setVelocity(const double& para);
-	void setTarget(const Target& t);
+	void setIndex(const int&);
+	void setVelocity(const double&);
+	void setTarget(const Target&);
+	void setTd(const double&);
 
 	void updateRange(void);
 	void updateGamma(void);

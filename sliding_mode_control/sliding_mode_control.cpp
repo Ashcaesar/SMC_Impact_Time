@@ -80,7 +80,7 @@ int main() {
 	}
 
 	//读取无人机输入参数
-	read_data(quad_input, quad, num, 4);
+	read_data(quad_input, quad, num, 6);
 	for (int i = 0; i < num; i++) quad[i].setIndex(i);
 
 	//打开输出文件
@@ -104,7 +104,7 @@ int main() {
 	//集结部分
 	double tmax = 0;
 	for (int i = 0; i < num; i++) {
-		if (quad[i].getTimp() > tmax) tmax = quad[i].getTimp();
+		if (quad[i].getTd() > tmax) tmax = quad[i].getTd();
 	}
 	for (double t = 0; t < tmax; t += dt) {
 		for (int i = 0; i < num; i++) {
@@ -131,10 +131,6 @@ int main() {
 	//编队飞行部分
 	int count = 0;
 	double time = 0;
-	for (int i = 0; i < num; i++) {
-		quad[i].setAccleration(0.0);
-		quad[i].setVelocity(0.0);
-	}
 	for (double t = 0; t <= 200; t += dt) {
 		leader->updateState();
 		for (int i = 0; i < num; i++) {
@@ -156,7 +152,7 @@ int main() {
 				quad[i].updateTgo();
 				if (quad[i].getTgo() > tmax) tmax = quad[i].getTgo();
 				for (int i = 0; i < num; i++) {
-					quad[i].setTimp(tmax);
+					quad[i].setTd(tmax);
 				}
 			}
 		}
@@ -173,7 +169,7 @@ int main() {
 				quad[i].updateTgo();
 				if (quad[i].getTgo() > tmax) tmax = quad[i].getTgo();
 				for (int i = 0; i < num; i++) {
-					quad[i].setTimp(tmax);
+					quad[i].setTd(tmax);
 				}
 			}
 		}

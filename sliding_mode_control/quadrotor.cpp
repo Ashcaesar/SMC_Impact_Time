@@ -11,13 +11,14 @@ extern const double mu;
 extern const double rho;
 extern const double k1;
 extern const double alpha1;
+extern const double alpha2;
 
 Quadrotor::Quadrotor(void) {};
 
 Quadrotor::~Quadrotor() {};
 
 bool Quadrotor::init(const std::vector<double> para) {
-	if (para.size() != 4) {
+	if (para.size() != 6) {
 		cout << "number of quadrotor's parameter is wrong, initial failed!" << endl;
 		return false;
 	}
@@ -25,7 +26,8 @@ bool Quadrotor::init(const std::vector<double> para) {
 	POS.y = para[1];
 	VELOCITY = para[2];
 	GAMMA = para[3] * PI / 180;
-	THETA_d = para[4] * PI / 180;
+	T_d = para[4];
+	THETA_d = para[5] * PI / 180;
 
 	ACCELERATION_Mn = ACCELERATION_Mt = 0;
 	ACC.x = ACCELERATION_Mn * cos(GAMMA + PI / 2) + ACCELERATION_Mt * cos(GAMMA);
@@ -68,20 +70,32 @@ pair<double,double> Quadrotor::getAccleration(void) const {
 	return { ACCELERATION_Mn,ACCELERATION_Mt };
 }
 
+double Quadrotor::getTgo(void) const {
+	return Tgo;
+}
+
+double Quadrotor::getTd(void) const {
+	return T_d;
+}
+
 /*************************************************************/
 //public set function
 /************************************************************/
 
-void Quadrotor::setIndex(const int& x) {
-	INDEX = x;
+void Quadrotor::setIndex(const int& para) {
+	INDEX = para;
 }
 
 void Quadrotor::setVelocity(const double& para) {
 	VELOCITY = para;
 }
 
-void Quadrotor::setTarget(const Target& t) {
-	target = t;
+void Quadrotor::setTarget(const Target& para) {
+	target = para;
+}
+
+void Quadrotor::setTd(const double& para) {
+	T_d = para;
 }
 
 void Quadrotor::updateRange(void) {
@@ -105,17 +119,21 @@ void Quadrotor::updateTgo(void) {
 }
 
 void Quadrotor::updateS(const double& t) {
-	Td = t + Tgo;
 	S1 = mu * pow(abs(e_THETA), rho)*sign(e_THETA) - VELOCITY * sin(THETA_M) / RANGE;
-	S2 = t + Tgo - Td;
+	S2 = t + Tgo - T_d;
 }
 
 void Quadrotor::updateAcc(Quadrotor* quad, int num) {
-	//滑模面控制加速度
+	//double k2 = 1.5*abs(S1);
+	double k2 = 0.7;
+	double nu = -alpha2 * pow(abs(S2), 1 / 3)*sign(S2);
 	double U1 = -phi(e_THETA)*VELOCITY*sin(THETA_M) / RANGE + k1 * pow(abs(S1), 0.5)*sign(S1) + k2 * sign(S1);
 	double U2 = alpha1 * pow(abs(S2), 2 / 3)*sign(S2) - nu;
 	ACCELERATION_Mt = -pow(VELOCITY*sin(THETA_M), 2)*cos(THETA_M) + RANGE * sin(THETA_M)*U1 + pow(VELOCITY, 2) / RANGE * pow(cos(THETA_M), 3)*U2;
 	ACCELERATION_Mn = -pow(VELOCITY, 2)*sin(THETA_M)*(1 + pow(cos(THETA_M), 2)) / RANGE + RANGE * cos(THETA_M)*U1 - pow(VELOCITY*cos(THETA_M), 2) / RANGE * sin(THETA_M)*U2;
+
+	ACCELERATION_Mt = abs(ACCELERATION_Mt) > 100 ? 100 * sign(ACCELERATION_Mt) : ACCELERATION_Mt;
+	ACCELERATION_Mn = abs(ACCELERATION_Mn) > 200 ? 200 * sign(ACCELERATION_Mn) : ACCELERATION_Mn;
 	
 	ACC.x = ACCELERATION_Mn * cos(GAMMA + PI / 2) + ACCELERATION_Mt * cos(GAMMA);
 	ACC.y = ACCELERATION_Mn * sin(GAMMA + PI / 2) + ACCELERATION_Mt * sin(GAMMA);
