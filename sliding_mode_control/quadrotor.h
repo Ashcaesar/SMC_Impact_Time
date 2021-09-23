@@ -2,8 +2,11 @@
 
 #include<stdlib.h>
 #include<vector>
+#include<utility>
 
 #include"target.h"
+
+using namespace std;
 
 class Quadrotor
 {
@@ -14,19 +17,20 @@ private:
 	coordinate ACC;
 	double VELOCITY;
 	double ACCELERATION;
+	double ACCELERATION_Mn;
+	double ACCELERATION_Mt;
 	double GAMMA;
 	double THETA;
 	double THETA_M;
+	double THETA_d;
+	double e_THETA;
 	double Tgo;
-	double Timp;
+	double Td;
 	double RANGE;
-	double S;
+	double S1;
+	double S2;
 
 	Target target;
-	double ACC_EQ;
-	double ACC_MCON;
-	double ACC_SW;
-	coordinate ACC_RUPLSION;
 
 public:
 	Quadrotor(void);
@@ -36,20 +40,16 @@ public:
 	bool init(const std::vector<double> para);
 
 	//public get function
-	double getTimp(void) const;
-	double getTgo(void) const;
 	double getRange(void) const;
 	coordinate getPos(void) const;
 	coordinate getVel(void) const;
 	double getVelocity(void) const;
 	coordinate getAcc(void) const;
-	double getAccleration(void) const;
+	pair<double,double> getAccleration(void) const;
 
 	//public set function
 	void setIndex(const int& x);
 	void setVelocity(const double& para);
-	void setAccleration(const double& para);
-	void setTimp(const double& t);
 	void setTarget(const Target& t);
 
 	void updateRange(void);
@@ -62,6 +62,6 @@ public:
 	void updateState(void);
 	
 	double sign(const double& x);
-	double H(const double& x);
+	double phi(const double& x);
 	double sgmf(const double& x);
 };

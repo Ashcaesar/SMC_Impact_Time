@@ -12,7 +12,13 @@
 extern const double g = 9.81;
 extern const double PI = 3.1415926535;
 extern const double dt = 0.01;
-
+extern const double alpha1 = 0.45;
+extern const double alpha2 = 0.2;
+extern const double mu = 0.1;
+extern const double k1 = 0.5;
+extern const double lambda = 0.1;
+extern const double tau = 0.01;
+extern const double rho = 0.6;
 
 using namespace std;
 
@@ -74,7 +80,7 @@ int main() {
 	}
 
 	//读取无人机输入参数
-	read_data(quad_input, quad, num, 5);
+	read_data(quad_input, quad, num, 4);
 	for (int i = 0; i < num; i++) quad[i].setIndex(i);
 
 	//打开输出文件
