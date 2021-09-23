@@ -9,16 +9,10 @@
 #include"quadrotor.h"
 #include"function.h"
 
-extern const double K = 50;
-extern const double M = 10;
-extern const double N = 3;
-extern const double P = 2;
-extern const double Eps_1 = 0.001;
-extern const double Eps_2 = 0.015;
 extern const double g = 9.81;
 extern const double PI = 3.1415926535;
 extern const double dt = 0.01;
-extern const double Min_Distance = 3.0;
+
 
 using namespace std;
 
