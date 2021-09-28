@@ -2,7 +2,8 @@
 #include<iostream>
 #include<vector>
 
-#include "quadrotor.h"
+#include"quadrotor.h"
+#include"intergral.h"
 
 extern const double g;
 extern const double dt;
@@ -16,6 +17,12 @@ extern const double alpha2;
 Quadrotor::Quadrotor(void) {};
 
 Quadrotor::~Quadrotor() {};
+
+double Quadrotor::dnu(double t)
+{
+	double s = t + RANGE / (VELOCITY*cos(THETA_M)) - T_d;
+	return -alpha2 * pow(abs(s), 1 / 3)*sign(s);
+}
 
 bool Quadrotor::init(const std::vector<double> para) {
 	if (para.size() != 6) {
@@ -123,10 +130,9 @@ void Quadrotor::updateS(const double& t) {
 	S2 = t + Tgo - T_d;
 }
 
-void Quadrotor::updateAcc(Quadrotor* quad, int num) {
-	//double k2 = 1.5*abs(S1);
+void Quadrotor::updateAcc(Quadrotor* quad, int num, double t) {
 	double k2 = 0.7;
-	double nu = -alpha2 * pow(abs(S2), 1 / 3)*sign(S2);
+	double nu = calculateNu(t);
 	double U1 = -phi(e_THETA)*VELOCITY*sin(THETA_M) / RANGE + k1 * pow(abs(S1), 0.5)*sign(S1) + k2 * sign(S1);
 	double U2 = alpha1 * pow(abs(S2), 2 / 3)*sign(S2) - nu;
 	ACCELERATION_Mt = -pow(VELOCITY*sin(THETA_M), 2)*cos(THETA_M) / RANGE + RANGE * sin(THETA_M)*U1 + pow(VELOCITY*cos(THETA_M), 2) / RANGE * cos(THETA_M)*U2;
@@ -151,6 +157,12 @@ void Quadrotor::updateState(void) {
 	//RANGE = sqrt(pow(target.getTP()[0] - POSX, 2) + pow(target.getTP()[1] - POSY, 2));
 	updateTheta_m();
 	//THETA_M = GAMMA - THETA;
+}
+
+double Quadrotor::calculateNu(double t) {
+	intergral calculate;
+	double(*f)(double) = this->dnu;
+	return calculate.DefiniteIntergral(f, 0, t, 0.01);
 }
 
 double Quadrotor::sign(const double& x) {

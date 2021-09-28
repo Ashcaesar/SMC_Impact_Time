@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="coordinate.cpp" />
     <ClCompile Include="function.cpp" />
+    <ClCompile Include="intergral.cpp" />
     <ClCompile Include="quadrotor.cpp" />
     <ClCompile Include="sliding_mode_control.cpp" />
     <ClCompile Include="target.cpp" />
@@ -132,6 +133,7 @@
   <ItemGroup>
     <ClInclude Include="coordinate.h" />
     <ClInclude Include="function.h" />
+    <ClInclude Include="intergral.h" />
     <ClInclude Include="quadrotor.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="target.h" />

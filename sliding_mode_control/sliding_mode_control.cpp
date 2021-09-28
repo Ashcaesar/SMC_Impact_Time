@@ -110,7 +110,7 @@ int main() {
 			if (quad[i].getRange() > 1) {
 				quad[i].updateTgo();
 				quad[i].updateS(t);
-				quad[i].updateAcc(quad, num);
+				quad[i].updateAcc(quad, num, t);
 				quad[i].updateState();
 				assemble[i].updateState();
 				quad[i].setTarget(assemble[i]);

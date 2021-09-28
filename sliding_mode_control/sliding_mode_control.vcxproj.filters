@@ -30,6 +30,9 @@
     <ClCompile Include="coordinate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="intergral.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="quadrotor.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="coordinate.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="intergral.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

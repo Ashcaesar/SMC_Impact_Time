@@ -9,8 +9,11 @@ using namespace std;
 
 template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, int num_of_para);
 template<typename T> void write_data(ofstream& file, T goal);
+
+//计算旋转后坐标
 coordinate transition(const coordinate prev, const coordinate base, const double& theta);
 
+//文件读取
 template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, int num_of_para) {
 	if (!file) {
 		cout << "文件打开失败！" << endl;
@@ -34,6 +37,7 @@ template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, in
 	file.close();
 }
 
+//文件写入
 template<typename T> void write_data(ofstream& file, T goal) {
 	coordinate pos = goal.getPos();
 	coordinate vel = goal.getVel();
