@@ -99,19 +99,17 @@ int main() {
 		cout << "leader输出文件打开失败！" << endl;
 		return 0;
 	}
-	
-	//基于比例导引和期望时间的滑模面控制
+
 	//集结部分
 	double tmax = 0;
 	for (int i = 0; i < num; i++) {
-		if (quad[i].getTd() > tmax) tmax = quad[i].getTd();
+		if (quad[i].getTd() > tmax) tmax = quad[i].getTd();		//最长期望时间
 	}
 	for (double t = 0; t < tmax; t += dt) {
 		for (int i = 0; i < num; i++) {
 			if (quad[i].getRange() > 1) {
 				quad[i].updateTgo();
 				quad[i].updateS(t);
-				assemble[i].updateTP(quad[i].getTgo());
 				quad[i].updateAcc(quad, num);
 				quad[i].updateState();
 				assemble[i].updateState();
@@ -129,6 +127,7 @@ int main() {
 	}*/
 
 	//编队飞行部分
+	/*
 	int count = 0;
 	double time = 0;
 	for (double t = 0; t <= 200; t += dt) {
@@ -137,10 +136,9 @@ int main() {
 			tar[i].setPos(transition(form[i], leader->getPos(), leader->getGamma()));
 			tar[i].setVelocity(leader->getVelocity());
 			tar[i].setGamma(leader->getGamma());
-			tar[i].updateTP(quad[i].getTgo());
 		}
 		count++;
-		if (count == 50) {
+		if (count % 200==0) {
 			time = 0;
 			tmax = 0;
 			for (int i = 0; i < num; i++) {
@@ -156,7 +154,7 @@ int main() {
 				}
 			}
 		}
-
+		
 		if (abs(time - tmax) < 0.1) {
 			time = 0;
 			tmax = 0;
@@ -173,6 +171,7 @@ int main() {
 				}
 			}
 		}
+
 		for (int i = 0; i < num; i++) {
 			quad[i].updateS(time);
 			quad[i].updateAcc(quad, num);
@@ -183,6 +182,7 @@ int main() {
 		time += dt;
 		write_data(leader_output, leader[0]);
 	}
+	*/
 
 	quad_output.close();
 	leader_output.close();

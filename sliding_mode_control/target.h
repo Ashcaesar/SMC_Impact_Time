@@ -10,7 +10,6 @@ class Target
 private:
 	coordinate POS;
 	coordinate VEL;
-	coordinate TP;
 
 	double VELOCITY;
 	double GAMMA;
@@ -25,7 +24,6 @@ public:
 	coordinate getPos(void) const;
 	coordinate getVel(void) const;
 	double getVelocity(void) const;
-	coordinate getTP(void) const;
 	double getGamma(void) const;
 
 	//public set function
@@ -34,5 +32,4 @@ public:
 	void setVel(const coordinate& para);
 	void setVelocity(const double& para);
 	void updateState(void);
-	void updateTP(const double& tgo);
 };

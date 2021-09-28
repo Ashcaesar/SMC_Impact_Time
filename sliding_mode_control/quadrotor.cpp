@@ -99,7 +99,7 @@ void Quadrotor::setTd(const double& para) {
 }
 
 void Quadrotor::updateRange(void) {
-	RANGE = sqrt((target.getTP() - POS) * (target.getTP() - POS));
+	RANGE = sqrt((target.getPos() - POS) * (target.getPos() - POS));
 }
 
 void Quadrotor::updateGamma(void) {
@@ -107,7 +107,7 @@ void Quadrotor::updateGamma(void) {
 }
 
 void Quadrotor::updateTheta(void) {
-	THETA = atan2(target.getTP().y - POS.y, target.getTP().x - POS.x);
+	THETA = atan2(target.getPos().y - POS.y, target.getPos().x - POS.x);
 }
 
 void Quadrotor::updateTheta_m(void) {
@@ -129,7 +129,7 @@ void Quadrotor::updateAcc(Quadrotor* quad, int num) {
 	double nu = -alpha2 * pow(abs(S2), 1 / 3)*sign(S2);
 	double U1 = -phi(e_THETA)*VELOCITY*sin(THETA_M) / RANGE + k1 * pow(abs(S1), 0.5)*sign(S1) + k2 * sign(S1);
 	double U2 = alpha1 * pow(abs(S2), 2 / 3)*sign(S2) - nu;
-	ACCELERATION_Mt = -pow(VELOCITY*sin(THETA_M), 2)*cos(THETA_M) + RANGE * sin(THETA_M)*U1 + pow(VELOCITY, 2) / RANGE * pow(cos(THETA_M), 3)*U2;
+	ACCELERATION_Mt = -pow(VELOCITY*sin(THETA_M), 2)*cos(THETA_M) / RANGE + RANGE * sin(THETA_M)*U1 + pow(VELOCITY*cos(THETA_M), 2) / RANGE * cos(THETA_M)*U2;
 	ACCELERATION_Mn = -pow(VELOCITY, 2)*sin(THETA_M)*(1 + pow(cos(THETA_M), 2)) / RANGE + RANGE * cos(THETA_M)*U1 - pow(VELOCITY*cos(THETA_M), 2) / RANGE * sin(THETA_M)*U2;
 
 	ACCELERATION_Mt = abs(ACCELERATION_Mt) > 100 ? 100 * sign(ACCELERATION_Mt) : ACCELERATION_Mt;

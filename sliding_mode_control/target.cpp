@@ -37,10 +37,6 @@ double Target::getVelocity(void) const {
 	return VELOCITY;
 }
 
-coordinate Target::getTP(void) const {
-	return TP;
-}
-
 double Target::getGamma(void) const {
 	return GAMMA;
 }
@@ -64,9 +60,4 @@ void Target::updateState(void) {
 	VEL.x = VELOCITY * cos(GAMMA);
 	VEL.y = VELOCITY * sin(GAMMA);
 	POS = POS + VEL * dt;
-}
-
-void Target::updateTP(const double& tgo) {
-	TP.x = POS.x + VELOCITY * cos(GAMMA)*tgo;
-	TP.y = POS.y + VELOCITY * cos(GAMMA)*tgo;
 }
