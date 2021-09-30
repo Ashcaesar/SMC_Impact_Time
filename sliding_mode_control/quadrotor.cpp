@@ -3,7 +3,6 @@
 #include<vector>
 
 #include"quadrotor.h"
-#include"intergral.h"
 
 extern const double g;
 extern const double dt;
@@ -132,7 +131,7 @@ void Quadrotor::updateS(const double& t) {
 
 void Quadrotor::updateAcc(Quadrotor* quad, int num, double t) {
 	double k2 = 0.7;
-	double nu = calculateNu(t);
+	double nu = calculateNu(0,t,0.01);
 	double U1 = -phi(e_THETA)*VELOCITY*sin(THETA_M) / RANGE + k1 * pow(abs(S1), 0.5)*sign(S1) + k2 * sign(S1);
 	double U2 = alpha1 * pow(abs(S2), 2 / 3)*sign(S2) - nu;
 	ACCELERATION_Mt = -pow(VELOCITY*sin(THETA_M), 2)*cos(THETA_M) / RANGE + RANGE * sin(THETA_M)*U1 + pow(VELOCITY*cos(THETA_M), 2) / RANGE * cos(THETA_M)*U2;
@@ -159,10 +158,16 @@ void Quadrotor::updateState(void) {
 	//THETA_M = GAMMA - THETA;
 }
 
-double Quadrotor::calculateNu(double t) {
-	intergral calculate;
-	double(*f)(double) = this->dnu;
-	return calculate.DefiniteIntergral(f, 0, t, 0.01);
+double Quadrotor::calculateNu(const double lower, const double upper, const double step) {
+	double ans = 0;
+	double value1 = dnu(lower), value2, s;
+	for (double i = lower; i < upper; i += step) {
+		value2 = dnu(i+step);
+		s = (value1 + value2)*step / 2;
+		value1 = value2;
+		ans += s;
+	}
+	return ans;
 }
 
 double Quadrotor::sign(const double& x) {

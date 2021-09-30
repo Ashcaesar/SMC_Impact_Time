@@ -62,7 +62,7 @@ public:
 	void updateAcc(Quadrotor*, int, double);
 	void updateTgo(void);
 	void updateState(void);
-	double calculateNu(double);
+	double calculateNu(const double, const double, const double);
 	
 	double sign(const double&);
 	double phi(const double&);

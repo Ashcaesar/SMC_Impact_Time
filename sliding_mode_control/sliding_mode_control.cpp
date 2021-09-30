@@ -127,7 +127,7 @@ int main() {
 	}*/
 
 	//编队飞行部分
-	/*
+	/**/
 	int count = 0;
 	double time = 0;
 	for (double t = 0; t <= 200; t += dt) {
@@ -174,7 +174,7 @@ int main() {
 
 		for (int i = 0; i < num; i++) {
 			quad[i].updateS(time);
-			quad[i].updateAcc(quad, num);
+			quad[i].updateAcc(quad, num, t);
 			quad[i].updateState();
 			write_data(quad_output, quad[i]);
 			write_data(target_output, tar[i]);
@@ -182,7 +182,7 @@ int main() {
 		time += dt;
 		write_data(leader_output, leader[0]);
 	}
-	*/
+	/**/
 
 	quad_output.close();
 	leader_output.close();
