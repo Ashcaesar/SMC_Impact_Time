@@ -29,14 +29,17 @@ private:
 	double RANGE;
 	double S1;
 	double S2;
-	double dnu(double);
 	Target target;
+	double nu;
+	double dnu(void);
+	double dnu(const double&);
+	double dk2(double);
 
-public:
+public:	
 	Quadrotor(void);
 	~Quadrotor();
 	//initial
-	bool init(const std::vector<double> para);
+	bool init(const std::vector<double>& para);
 
 	//public get function
 	double getRange(void) const;
@@ -58,11 +61,13 @@ public:
 	void updateGamma(void);
 	void updateTheta(void);
 	void updateTheta_m(void);
+	void updateE_theta(void);
 	void updateS(const double&);
-	void updateAcc(Quadrotor*, int, double);
+	void updateAcc(Quadrotor*, const int&, const double&);
 	void updateTgo(void);
 	void updateState(void);
-	double calculateNu(const double, const double, const double);
+	double integral_Nu(const double&, const double&, const double&);
+	double integral_k2(const double&, const double&, const double&);
 	
 	double sign(const double&);
 	double phi(const double&);

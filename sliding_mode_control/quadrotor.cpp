@@ -10,6 +10,7 @@ extern const double PI;
 extern const double mu;
 extern const double rho;
 extern const double k1;
+extern const double k2_bar;
 extern const double alpha1;
 extern const double alpha2;
 
@@ -17,13 +18,7 @@ Quadrotor::Quadrotor(void) {};
 
 Quadrotor::~Quadrotor() {};
 
-double Quadrotor::dnu(double t)
-{
-	double s = t + RANGE / (VELOCITY*cos(THETA_M)) - T_d;
-	return -alpha2 * pow(abs(s), 1 / 3)*sign(s);
-}
-
-bool Quadrotor::init(const std::vector<double> para) {
+bool Quadrotor::init(const std::vector<double>& para) {
 	if (para.size() != 6) {
 		cout << "number of quadrotor's parameter is wrong, initial failed!" << endl;
 		return false;
@@ -34,16 +29,17 @@ bool Quadrotor::init(const std::vector<double> para) {
 	GAMMA = para[3] * PI / 180;
 	T_d = para[4];
 	THETA_d = para[5] * PI / 180;
+	nu = 0;
 
 	ACCELERATION_Mn = ACCELERATION_Mt = 0;
 	ACC.x = ACCELERATION_Mn * cos(GAMMA + PI / 2) + ACCELERATION_Mt * cos(GAMMA);
 	ACC.y = ACCELERATION_Mn * sin(GAMMA + PI / 2) + ACCELERATION_Mt * sin(GAMMA);
 	VEL.x = VELOCITY * cos(GAMMA);
 	VEL.y = VELOCITY * sin(GAMMA);
-	RANGE = sqrt((target.getPos() - POS)*(target.getPos() - POS));
-	THETA = atan2(target.getPos().y - POS.y, target.getPos().x - POS.x);
-	THETA_M = GAMMA - THETA;
-	e_THETA = THETA - THETA_d;
+	updateRange();
+	updateTheta();
+	updateTheta_m();
+	updateE_theta();
 	updateTgo();
 	return true;
 }
@@ -51,6 +47,19 @@ bool Quadrotor::init(const std::vector<double> para) {
 /*************************************************************/
 //public get function
 /************************************************************/
+
+double Quadrotor::dnu(void) {
+	return -alpha2 * pow(abs(S2), 1 / 3)*sign(S2);
+}
+
+double Quadrotor::dnu(const double& t) {
+	double s = t + RANGE / (VELOCITY*cos(THETA_M)) - T_d;
+	return -alpha2 * pow(abs(s), 1 / 3)*sign(s);
+}
+
+double Quadrotor::dk2(double t) {
+	return k2_bar * abs(S1);
+}
 
 double Quadrotor::getRange(void) const {
 	return sqrt((target.getPos() - POS) * (target.getPos() - POS));
@@ -120,18 +129,26 @@ void Quadrotor::updateTheta_m(void) {
 	THETA_M = GAMMA - THETA;
 }
 
+void Quadrotor::updateE_theta(void) {
+	e_THETA = THETA - THETA_d;
+}
+
 void Quadrotor::updateTgo(void) {
 	Tgo = RANGE / (VELOCITY*cos(THETA_M));
 }
 
 void Quadrotor::updateS(const double& t) {
+	updateTgo();
+	updateE_theta();
 	S1 = mu * pow(abs(e_THETA), rho)*sign(e_THETA) - VELOCITY * sin(THETA_M) / RANGE;
 	S2 = t + Tgo - T_d;
 }
 
-void Quadrotor::updateAcc(Quadrotor* quad, int num, double t) {
-	double k2 = 0.7;
-	double nu = calculateNu(0,t,0.01);
+void Quadrotor::updateAcc(Quadrotor* quad, const int& num, const double& t) {
+	updateS(t);
+	/**/double k2 = 0.7;/**/
+	nu += dnu()*dt;
+	/*double k2 = integral_k2(0, t, 0.01);/**/
 	double U1 = -phi(e_THETA)*VELOCITY*sin(THETA_M) / RANGE + k1 * pow(abs(S1), 0.5)*sign(S1) + k2 * sign(S1);
 	double U2 = alpha1 * pow(abs(S2), 2 / 3)*sign(S2) - nu;
 	ACCELERATION_Mt = -pow(VELOCITY*sin(THETA_M), 2)*cos(THETA_M) / RANGE + RANGE * sin(THETA_M)*U1 + pow(VELOCITY*cos(THETA_M), 2) / RANGE * cos(THETA_M)*U2;
@@ -158,11 +175,23 @@ void Quadrotor::updateState(void) {
 	//THETA_M = GAMMA - THETA;
 }
 
-double Quadrotor::calculateNu(const double lower, const double upper, const double step) {
+double Quadrotor::integral_Nu(const double& lower, const double& upper, const double& step) {
 	double ans = 0;
 	double value1 = dnu(lower), value2, s;
 	for (double i = lower; i < upper; i += step) {
 		value2 = dnu(i+step);
+		s = (value1 + value2)*step / 2;
+		value1 = value2;
+		ans += s;
+	}
+	return ans;
+}
+
+double Quadrotor::integral_k2(const double& lower, const double& upper, const double& step) {
+	double ans = 0.03;
+	double value1 = dk2(lower), value2, s;
+	for (double i = lower; i < upper; i += step) {
+		value2 = dk2(i + step);
 		s = (value1 + value2)*step / 2;
 		value1 = value2;
 		ans += s;

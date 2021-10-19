@@ -10,7 +10,7 @@ extern const double PI;
 Target::Target(void) {};
 Target::~Target() {};
 
-bool Target::init(std::vector<double> para) {
+bool Target::init(std::vector<double>& para) {
 	if (para.size() != 4) {
 		std::cout << "number of target's parameter is wrong, initial failed!" << std::endl;
 		return false;
@@ -22,6 +22,16 @@ bool Target::init(std::vector<double> para) {
 
 	VEL.x = VELOCITY * cos(GAMMA);
 	VEL.y = VELOCITY * sin(GAMMA);
+	return true;
+}
+
+bool Target::init(coordinate& para) {
+	POS.x = para.x;
+	POS.y = para.y;
+	VELOCITY = 0;
+	GAMMA = 0;
+	VEL.x = 0;
+	VEL.y = 0;
 	return true;
 }
 

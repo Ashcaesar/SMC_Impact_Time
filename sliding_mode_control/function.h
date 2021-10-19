@@ -11,7 +11,7 @@ template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, in
 template<typename T> void write_data(ofstream& file, T goal);
 
 //计算旋转后坐标
-coordinate transition(const coordinate prev, const coordinate base, const double& theta);
+coordinate transition(const coordinate& prev, const coordinate& base, const double& theta);
 
 //文件读取
 template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, int num_of_para) {
@@ -22,11 +22,11 @@ template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, in
 	string s;
 	double tmp;
 	stringstream sstream;
-	for (int i = 0; i < num_of_quad; i++) {
+	for (int i = 0; i < num_of_quad; ++i) {
 		getline(file, s);
 		sstream << s;
 		vector<double> para;
-		for (int j = 0; j < num_of_para; j++) {
+		for (int j = 0; j < num_of_para; ++j) {
 			sstream >> tmp;
 			para.push_back(tmp);
 		}

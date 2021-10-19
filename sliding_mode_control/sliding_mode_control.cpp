@@ -16,6 +16,7 @@ extern const double alpha1 = 0.45;
 extern const double alpha2 = 0.2;
 extern const double mu = 0.1;
 extern const double k1 = 0.5;
+extern const double k2_bar = 1.5;
 extern const double lambda = 0.1;
 extern const double tau = 0.01;
 extern const double rho = 0.6;
@@ -28,12 +29,12 @@ int main() {
 	//cin >> num;
 	int num = 4;
 
-	ifstream quad_input, form_input, leader_input;				//输入文件
-	ofstream quad_output, target_output, leader_output;			//输出文件
+	ifstream quad_input, form_input, leader_input;				//输入文件:无人机,队形,长机
+	ofstream quad_output, virtual_output, leader_output;		//输出文件:无人机,虚拟长机,长机
 	Target* leader = new Target;								//长机，Target对象
-	Target* assemble = new Target[num];							//集结点，Target对象
-	Target* tar = new Target[num];								//目标点，Target对象
-	Quadrotor* quad = new Quadrotor[num];						//无人机，Quadrotor对象
+	Target* assemble = new Target[num];							//集结点，Target数组
+	Target* virt = new Target[num];								//目标点，Target数组
+	Quadrotor* quad = new Quadrotor[num];						//无人机，Quadrotor数组
 	vector<coordinate> form(num);								//编队队形
 	leader_input.open("leader input.txt", ifstream::in);
 	form_input.open("form input.txt", ifstream::in);
@@ -41,15 +42,15 @@ int main() {
 
 	//读取长机输入参数
 	read_data(leader_input, leader, 1, 4);
-	
+
 	//读取队形参数
 	string s;
 	stringstream sstream;
 	double tmp;
-	for (int i = 0; i < num; i++) {
+	for (int i = 0; i < num; ++i) {
 		getline(form_input, s);
 		sstream << s;
-		for (int j = 0; j < 2; j++) {
+		for (int j = 0; j < 2; ++j) {
 			sstream >> tmp;
 			if (j == 0) form[i].x = tmp;
 			else form[i].y = tmp;
@@ -59,15 +60,10 @@ int main() {
 	}
 	form_input.close();
 
-	//初始化集结点和目标点参数
+	//初始化集结点和虚拟点参数
 	for (int i = 0; i < num; i++) {
-		vector<double> data;
 		coordinate trans = transition(form[i], leader->getPos(), leader->getGamma());
-		data.push_back(trans.x);
-		data.push_back(trans.y);
-		data.push_back(0);
-		data.push_back(0);
-		assemble[i].init(data);
+		assemble[i].init(trans);
 		quad[i].setTarget(assemble[i]);
 
 		vector<double> tmp;
@@ -76,47 +72,47 @@ int main() {
 		tmp.push_back(pos.y);
 		tmp.push_back(leader->getVelocity());
 		tmp.push_back(leader->getGamma() * 180 / PI);
-		tar[i].init(tmp);
+		virt[i].init(tmp);
 	}
 
 	//读取无人机输入参数
 	read_data(quad_input, quad, num, 6);
-	for (int i = 0; i < num; i++) quad[i].setIndex(i);
+	for (int i = 0; i < num; ++i) quad[i].setIndex(i);
 
 	//打开输出文件
 	leader_output.open("leader output.txt", ofstream::out);
-	quad_output.open("quad output.txt", ofstream::out);
-	target_output.open("target output.txt", ofstream::out);
-	if (!quad_output) {
-		cout << "quadrotor输出文件打开失败！" << endl;
-		return 0;
-	}
-	if (!target_output) {
-		cout << "target输出文件打开失败！" << endl;
-		return 0;
-	}
 	if (!leader_output) {
-		cout << "leader输出文件打开失败！" << endl;
+		cerr << "leader输出文件打开失败！" << endl;
+		return 0;
+	}
+
+	quad_output.open("quad output.txt", ofstream::out);
+	if (!quad_output) {
+		cerr << "quadrotor输出文件打开失败！" << endl;
+		return 0;
+	}
+
+	virtual_output.open("virtual output.txt", ofstream::out);
+	if (!virtual_output) {
+		cerr << "virtual输出文件打开失败！" << endl;
 		return 0;
 	}
 
 	//集结部分
 	double tmax = 0;
-	for (int i = 0; i < num; i++) {
+	for (int i = 0; i < num; ++i) {
 		if (quad[i].getTd() > tmax) tmax = quad[i].getTd();		//最长期望时间
 	}
-	for (double t = 0; t < tmax; t += dt) {
-		for (int i = 0; i < num; i++) {
+	for (double time = 0; time <= tmax; time += dt) {
+		for (int i = 0; i < num; ++i) {
 			if (quad[i].getRange() > 1) {
-				quad[i].updateTgo();
-				quad[i].updateS(t);
-				quad[i].updateAcc(quad, num, t);
+				quad[i].updateAcc(quad, num, time);
 				quad[i].updateState();
 				assemble[i].updateState();
 				quad[i].setTarget(assemble[i]);
 			}
 			write_data(quad_output, quad[i]);
-			write_data(target_output, assemble[i]);
+			write_data(virtual_output, assemble[i]);
 		}
 		write_data(leader_output, leader[0]);
 	}
@@ -127,7 +123,7 @@ int main() {
 	}*/
 
 	//编队飞行部分
-	/**/
+	/*
 	int count = 0;
 	double time = 0;
 	for (double t = 0; t <= 200; t += dt) {
@@ -154,7 +150,7 @@ int main() {
 				}
 			}
 		}
-		
+
 		if (abs(time - tmax) < 0.1) {
 			time = 0;
 			tmax = 0;
@@ -182,13 +178,13 @@ int main() {
 		time += dt;
 		write_data(leader_output, leader[0]);
 	}
-	/**/
+	*/
 
 	quad_output.close();
 	leader_output.close();
-	target_output.close();
+	virtual_output.close();
 	delete[] quad;
-	delete[] tar;
+	delete[] virt;
 
 	return 0;
 }

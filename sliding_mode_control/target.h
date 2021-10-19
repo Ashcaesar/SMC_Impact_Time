@@ -18,7 +18,8 @@ public:
 	virtual ~Target();
 
 	//initial
-	virtual bool init(std::vector<double> para);
+	virtual bool init(std::vector<double>& para);
+	virtual bool init(coordinate& para);
 
 	//public get function
 	coordinate getPos(void) const;

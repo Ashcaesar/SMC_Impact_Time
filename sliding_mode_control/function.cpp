@@ -7,7 +7,7 @@
 
 extern const double PI;
 
-coordinate transition(const coordinate prev, const coordinate base, const double& theta) {
+coordinate transition(const coordinate& prev, const coordinate& base, const double& theta) {
 	double t = theta - PI / 2;
 	coordinate ans;
 	ans.x = base.x + prev.x*cos(t) - prev.y*sin(t);

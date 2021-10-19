@@ -2,4 +2,4 @@
 
 5000	3000	300	90
 
-//pos.x	pos.y	Velocity	Gamma
+//pos.x		pos.y	Velocity	Gamma
