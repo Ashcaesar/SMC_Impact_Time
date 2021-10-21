@@ -104,9 +104,8 @@ int main() {
 
 	//集结部分
 	double tmax = 0;
-	for (int i = 0; i < num; ++i) {
-		//最长期望时间
-		if (quad.at(i).getTd() > tmax) tmax = quad.at(i).getTd();
+	for (auto q : quad) {
+		tmax = max(tmax, q.getTd());
 	}
 	for (double time = 0; time <= tmax; time += dt) {
 		for (int i = 0; i < num; ++i) {
@@ -127,9 +126,8 @@ int main() {
 
 	//编队飞行部分
 	/**/
-	int count = 0;
-	double time = 0;
-	for (double t = 0; t <= 200; t += dt) {
+	double t = 0;
+	for (double time = 0; time <= 200; time += dt) {
 		leader.at(0).updateState();
 		//更新虚拟长机参数
 		for (int i = 0; i < num; ++i) {
@@ -137,33 +135,27 @@ int main() {
 			virt.at(i).setVelocity(leader.at(0).getVelocity());
 			virt.at(i).setGamma(leader.at(0).getGamma());
 		}
-		count++;
 		//重置目标点
-		if (count % 200==0) {
-			time = 0;
+		if (time == 10 || (t - tmax) < 0.1) {
+			t = 0;
 			tmax = 0;
 			for (auto q : quad) {
 				q.setTarget(virt.at(q.getIndex()));
-				q.updateState();
 				q.updateTgo();
-				if (q.getTgo() > tmax) tmax = q.getTgo();
-			}
-			for (auto q : quad) {
-				q.setTd(tmax);
+				tmax = max(tmax, q.getTgo());
 			}
 		}
 		//跟随目标
-		else {
-			for (auto q : quad) {
-				q.updateS(time);
-				q.updateAcc(quad, num, t);
-				q.updateState();
-			}
+		for (auto q : quad) {
+			q.updateS(time);
+			q.updateAcc(quad, num, t);
+			q.updateState();
 		}
 		write_data(quad_output, quad);
 		write_data(virtual_output, virt);
 		write_data(leader_output, leader);
 		time += dt;
+		t += dt;
 	}
 	/**/
 
