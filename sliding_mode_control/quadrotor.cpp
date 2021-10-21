@@ -30,6 +30,7 @@ bool Quadrotor::init(const std::vector<double>& para) {
 	T_d = para[4];
 	THETA_d = para[5] * PI / 180;
 	nu = 0;
+	temp_dnu = 0;
 
 	ACCELERATION_Mn = ACCELERATION_Mt = 0;
 	ACC.x = ACCELERATION_Mn * cos(GAMMA + PI / 2) + ACCELERATION_Mt * cos(GAMMA);
@@ -59,6 +60,10 @@ double Quadrotor::dnu(const double& t) {
 
 double Quadrotor::dk2(double t) {
 	return k2_bar * abs(S1);
+}
+
+int Quadrotor::getIndex(void) const {
+	return INDEX;
 }
 
 double Quadrotor::getRange(void) const {
@@ -144,10 +149,11 @@ void Quadrotor::updateS(const double& t) {
 	S2 = t + Tgo - T_d;
 }
 
-void Quadrotor::updateAcc(Quadrotor* quad, const int& num, const double& t) {
+void Quadrotor::updateAcc(vector<Quadrotor>& quad, const int& num, const double& t) {
 	updateS(t);
 	/**/double k2 = 0.7;/**/
-	nu += dnu()*dt;
+	nu += (temp_dnu + dnu()) * dt / 2;
+	temp_dnu = dnu();
 	/*double k2 = integral_k2(0, t, 0.01);/**/
 	double U1 = -phi(e_THETA)*VELOCITY*sin(THETA_M) / RANGE + k1 * pow(abs(S1), 0.5)*sign(S1) + k2 * sign(S1);
 	double U2 = alpha1 * pow(abs(S2), 2 / 3)*sign(S2) - nu;

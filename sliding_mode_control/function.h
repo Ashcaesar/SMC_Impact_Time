@@ -7,16 +7,16 @@
 
 using namespace std;
 
-template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, int num_of_para);
-template<typename T> void write_data(ofstream& file, T goal);
+template<typename T> void read_data(ifstream& file, T& goal, int num_of_quad, int num_of_para);
+template<typename T> void write_data(ofstream& file, vector<T>& goal);
 
 //计算旋转后坐标
 coordinate transition(const coordinate& prev, const coordinate& base, const double& theta);
 
 //文件读取
-template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, int num_of_para) {
+template<typename T> void read_data(ifstream& file, T& goal, int num_of_quad, int num_of_para) {
 	if (!file) {
-		cout << "文件打开失败！" << endl;
+		cerr << "文件打开失败！" << endl;
 		return;
 	}
 	string s;
@@ -30,7 +30,7 @@ template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, in
 			sstream >> tmp;
 			para.push_back(tmp);
 		}
-		goal[i].init(para);
+		goal.at(i).init(para);
 		sstream.clear();
 		sstream.str("");
 	}
@@ -38,8 +38,8 @@ template<typename T> void read_data(ifstream& file, T* goal, int num_of_quad, in
 }
 
 //文件写入
-template<typename T> void write_data(ofstream& file, T goal) {
-	coordinate pos = goal.getPos();
-	coordinate vel = goal.getVel();
-	file << pos.x << " " << pos.y << " " << vel.x << " " << vel.y << '\n';
+template<typename T> void write_data(ofstream& file, vector<T>& goal) {
+	for (auto g : goal) {
+		file << g.getPos().x << " " << g.getPos().y << " " << g.getVel().x << " " << g.getVel().y << '\n';
+	}
 }

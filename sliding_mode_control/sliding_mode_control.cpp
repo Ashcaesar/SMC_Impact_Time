@@ -31,10 +31,14 @@ int main() {
 
 	ifstream quad_input, form_input, leader_input;				//输入文件:无人机,队形,长机
 	ofstream quad_output, virtual_output, leader_output;		//输出文件:无人机,虚拟长机,长机
-	Target* leader = new Target;								//长机，Target对象
-	Target* assemble = new Target[num];							//集结点，Target数组
-	Target* virt = new Target[num];								//目标点，Target数组
-	Quadrotor* quad = new Quadrotor[num];						//无人机，Quadrotor数组
+	vector<Target> leader(1);
+	/*Target* leader = new Target;*/								//长机，Target对象
+	vector<Target> assemble(num);
+	/*Target* assemble = new Target[num];*/							//集结点，Target数组
+	vector<Target> virt(num);
+	/*Target* virt = new Target[num];*/								//目标点，Target数组
+	vector<Quadrotor> quad(num);
+	/*Quadrotor* quad = new Quadrotor[num];*/						//无人机，Quadrotor数组
 	vector<coordinate> form(num);								//编队队形
 	leader_input.open("leader input.txt", ifstream::in);
 	form_input.open("form input.txt", ifstream::in);
@@ -61,23 +65,23 @@ int main() {
 	form_input.close();
 
 	//初始化集结点和虚拟点参数
-	for (int i = 0; i < num; i++) {
-		coordinate trans = transition(form[i], leader->getPos(), leader->getGamma());
-		assemble[i].init(trans);
-		quad[i].setTarget(assemble[i]);
+	for (int i = 0; i < num; ++i) {
+		coordinate trans = transition(form.at(i), leader.at(0).getPos(), leader.at(0).getGamma());
+		assemble.at(i).init(trans);
+		quad.at(i).setTarget(assemble.at(i));
 
 		vector<double> tmp;
-		coordinate pos = assemble[i].getPos();
+		coordinate pos = assemble.at(i).getPos();
 		tmp.push_back(pos.x);
 		tmp.push_back(pos.y);
-		tmp.push_back(leader->getVelocity());
-		tmp.push_back(leader->getGamma() * 180 / PI);
-		virt[i].init(tmp);
+		tmp.push_back(leader.at(0).getVelocity());
+		tmp.push_back(leader.at(0).getGamma() * 180 / PI);
+		virt.at(i).init(tmp);
 	}
 
 	//读取无人机输入参数
 	read_data(quad_input, quad, num, 6);
-	for (int i = 0; i < num; ++i) quad[i].setIndex(i);
+	for (int i = 0; i < num; ++i) quad.at(i).setIndex(i);
 
 	//打开输出文件
 	leader_output.open("leader output.txt", ofstream::out);
@@ -101,90 +105,71 @@ int main() {
 	//集结部分
 	double tmax = 0;
 	for (int i = 0; i < num; ++i) {
-		if (quad[i].getTd() > tmax) tmax = quad[i].getTd();		//最长期望时间
+		//最长期望时间
+		if (quad.at(i).getTd() > tmax) tmax = quad.at(i).getTd();
 	}
 	for (double time = 0; time <= tmax; time += dt) {
 		for (int i = 0; i < num; ++i) {
-			if (quad[i].getRange() > 1) {
-				quad[i].updateAcc(quad, num, time);
-				quad[i].updateState();
-				assemble[i].updateState();
-				quad[i].setTarget(assemble[i]);
+			if (quad.at(i).getRange() > 1) {
+				quad.at(i).updateAcc(quad, num, time);
+				quad.at(i).updateState();
+				assemble.at(i).updateState();
+				quad.at(i).setTarget(assemble.at(i));
 			}
-			write_data(quad_output, quad[i]);
-			write_data(virtual_output, assemble[i]);
+			
 		}
-		write_data(leader_output, leader[0]);
+		write_data(quad_output, quad);
+		write_data(virtual_output, assemble);
+		write_data(leader_output, leader);
 	}
-	delete[] assemble;
 
-	/*for (int i = 0; i < num; i++) {
-		quad[i].setVelocity(0);
-	}*/
+	/**/for (auto& q : quad) { q.setVelocity(0); }/**/
 
 	//编队飞行部分
-	/*
+	/**/
 	int count = 0;
 	double time = 0;
 	for (double t = 0; t <= 200; t += dt) {
-		leader->updateState();
-		for (int i = 0; i < num; i++) {
-			tar[i].setPos(transition(form[i], leader->getPos(), leader->getGamma()));
-			tar[i].setVelocity(leader->getVelocity());
-			tar[i].setGamma(leader->getGamma());
+		leader.at(0).updateState();
+		//更新虚拟长机参数
+		for (int i = 0; i < num; ++i) {
+			virt.at(i).setPos(transition(form.at(i), leader.at(0).getPos(), leader.at(0).getGamma()));
+			virt.at(i).setVelocity(leader.at(0).getVelocity());
+			virt.at(i).setGamma(leader.at(0).getGamma());
 		}
 		count++;
+		//重置目标点
 		if (count % 200==0) {
 			time = 0;
 			tmax = 0;
-			for (int i = 0; i < num; i++) {
-				quad[i].setTarget(tar[i]);
-				quad[i].updateRange();
-				quad[i].updateGamma();
-				quad[i].updateTheta();
-				quad[i].updateTheta_m();
-				quad[i].updateTgo();
-				if (quad[i].getTgo() > tmax) tmax = quad[i].getTgo();
-				for (int i = 0; i < num; i++) {
-					quad[i].setTd(tmax);
-				}
+			for (auto q : quad) {
+				q.setTarget(virt.at(q.getIndex()));
+				q.updateState();
+				q.updateTgo();
+				if (q.getTgo() > tmax) tmax = q.getTgo();
+			}
+			for (auto q : quad) {
+				q.setTd(tmax);
 			}
 		}
-
-		if (abs(time - tmax) < 0.1) {
-			time = 0;
-			tmax = 0;
-			for (int i = 0; i < num; i++) {
-				quad[i].setTarget(tar[i]);
-				quad[i].updateRange();
-				quad[i].updateGamma();
-				quad[i].updateTheta();
-				quad[i].updateTheta_m();
-				quad[i].updateTgo();
-				if (quad[i].getTgo() > tmax) tmax = quad[i].getTgo();
-				for (int i = 0; i < num; i++) {
-					quad[i].setTd(tmax);
-				}
+		//跟随目标
+		else {
+			for (auto q : quad) {
+				q.updateS(time);
+				q.updateAcc(quad, num, t);
+				q.updateState();
 			}
 		}
-
-		for (int i = 0; i < num; i++) {
-			quad[i].updateS(time);
-			quad[i].updateAcc(quad, num, t);
-			quad[i].updateState();
-			write_data(quad_output, quad[i]);
-			write_data(target_output, tar[i]);
-		}
+		write_data(quad_output, quad);
+		write_data(virtual_output, virt);
+		write_data(leader_output, leader);
 		time += dt;
-		write_data(leader_output, leader[0]);
 	}
-	*/
+	/**/
 
 	quad_output.close();
 	leader_output.close();
 	virtual_output.close();
-	delete[] quad;
-	delete[] virt;
 
 	return 0;
 }

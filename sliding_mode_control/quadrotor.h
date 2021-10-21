@@ -33,6 +33,7 @@ private:
 	double nu;
 	double dnu(void);
 	double dnu(const double&);
+	double temp_dnu;
 	double dk2(double);
 
 public:	
@@ -42,6 +43,7 @@ public:
 	bool init(const std::vector<double>& para);
 
 	//public get function
+	int getIndex(void) const;
 	double getRange(void) const;
 	coordinate getPos(void) const;
 	coordinate getVel(void) const;
@@ -63,7 +65,7 @@ public:
 	void updateTheta_m(void);
 	void updateE_theta(void);
 	void updateS(const double&);
-	void updateAcc(Quadrotor*, const int&, const double&);
+	void updateAcc(vector<Quadrotor>&, const int&, const double&);
 	void updateTgo(void);
 	void updateState(void);
 	double integral_Nu(const double&, const double&, const double&);
