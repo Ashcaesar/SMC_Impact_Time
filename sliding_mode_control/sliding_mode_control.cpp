@@ -39,45 +39,20 @@ ostream& operator<<(ostream& os, const Quadrotor& quad) {
 }
 
 int main() {
-	//int num;
-	//cout << "输入无人机数量:" << endl;
-	//cin >> num;
 	int num = 4;
+	vector<Target> leader(1);			//长机,vector<Target>
+	vector<Target> assemble(num);		//集结点,vector<Target>
+	vector<Target> virt(num);			//目标点,vector<Target>
+	vector<Quadrotor> quad(num);		//无人机,vector<Quadrotor>
+	vector<coordinate> form(num);		//编队队形,vector<coordinate>
+	
+	ifstream quad_input_, form_input_, leader_input_;			//输入文件:无人机,队形,长机
+	leader_input_.open("leader input.txt", ifstream::in);
+	form_input_.open("form input.txt", ifstream::in);
+	quad_input_.open("quad input.txt", ifstream::in);
 
-	ifstream quad_input, form_input, leader_input;				//输入文件:无人机,队形,长机
-	ofstream quad_output, virtual_output, leader_output;		//输出文件:无人机,虚拟长机,长机
-	vector<Target> leader(1);
-	/*Target* leader = new Target;*/								//长机，Target对象
-	vector<Target> assemble(num);
-	/*Target* assemble = new Target[num];*/							//集结点，Target数组
-	vector<Target> virt(num);
-	/*Target* virt = new Target[num];*/								//目标点，Target数组
-	vector<Quadrotor> quad(num);
-	/*Quadrotor* quad = new Quadrotor[num];*/						//无人机，Quadrotor数组
-	vector<coordinate> form(num);								//编队队形
-	leader_input.open("leader input.txt", ifstream::in);
-	form_input.open("form input.txt", ifstream::in);
-	quad_input.open("quad input.txt", ifstream::in);
-
-	//读取长机输入参数
-	read_data(leader_input, leader, 1, 4);
-
-	//读取队形参数
-	string s;
-	stringstream sstream;
-	double tmp;
-	for (int i = 0; i < num; ++i) {
-		getline(form_input, s);
-		sstream << s;
-		for (int j = 0; j < 2; ++j) {
-			sstream >> tmp;
-			if (j == 0) form[i].x = tmp;
-			else form[i].y = tmp;
-		}
-		sstream.clear();
-		sstream.str("");
-	}
-	form_input.close();
+	read_data(leader_input_, leader, 1, 4);		//读取长机输入参数
+	read_form(form_input_, form, 4);			//读取队形参数
 
 	//初始化集结点和虚拟点参数
 	for (int i = 0; i < num; ++i) {
@@ -94,28 +69,13 @@ int main() {
 		virt.at(i).init(tmp);
 	}
 
-	//读取无人机输入参数
-	read_data(quad_input, quad, num, 6);
+	read_data(quad_input_, quad, num, 6);		//读取无人机输入参数
 	for (int i = 0; i < num; ++i) quad.at(i).setIndex(i);
 
-	//打开输出文件
-	leader_output.open("leader output.txt", ofstream::out);
-	if (!leader_output) {
-		cerr << "leader输出文件打开失败！" << endl;
-		return 0;
-	}
-
-	quad_output.open("quad output.txt", ofstream::out);
-	if (!quad_output) {
-		cerr << "quadrotor输出文件打开失败！" << endl;
-		return 0;
-	}
-
-	virtual_output.open("virtual output.txt", ofstream::out);
-	if (!virtual_output) {
-		cerr << "virtual输出文件打开失败！" << endl;
-		return 0;
-	}
+	ofstream quad_output_, virtual_output_, leader_output_;		//输出文件:无人机,虚拟长机,长机
+	leader_output_.open("leader output.txt", ofstream::out);
+	quad_output_.open("quad output.txt", ofstream::out);
+	virtual_output_.open("virtual output.txt", ofstream::out);
 
 	//集结部分
 	double tmax = 0;
@@ -131,15 +91,15 @@ int main() {
 				assemble.at(i).updateState();
 				quad.at(i).setTarget(assemble.at(i));
 			}
-			
+
 		}
-		write_data(quad_output, quad);
-		write_data(virtual_output, assemble);
-		write_data(leader_output, leader);
+		write_data(quad_output_, quad);
+		write_data(virtual_output_, assemble);
+		write_data(leader_output_, leader);
 	}
 
 	//编队飞行部分
-	/*
+	/**/
 	double t = 0;
 	for (double time = 0; time <= 200; time += dt) {
 		leader.at(0).updateState();
@@ -149,15 +109,10 @@ int main() {
 			virt.at(i).setVelocity(leader.at(0).getVelocity());
 			virt.at(i).setGamma(leader.at(0).getGamma());
 		}
-		//重置目标点
-		if (time == 10 || (t - tmax) < 0.1) {
-			t = 0;
-			tmax = 0;
-			for (auto q : quad) {
-				q.setTarget(virt.at(q.getIndex()));
-				q.updateTgo();
-				tmax = max(tmax, q.getT_go_());
-			}
+		for (auto q : quad) {
+			q.setTarget(virt.at(q.getIndex()));
+			q.updateTgo();
+			tmax = max(tmax, q.getT_go_());
 		}
 		//跟随目标
 		for (auto q : quad) {
@@ -165,9 +120,9 @@ int main() {
 			q.updateAcc(quad, num, t);
 			q.updateState();
 		}
-		write_data(quad_output, quad);
-		write_data(virtual_output, virt);
-		write_data(leader_output, leader);
+		write_data(quad_output_, quad);
+		write_data(virtual_output_, virt);
+		write_data(leader_output_, leader);
 		time += dt;
 		t += dt;
 	}
@@ -177,9 +132,9 @@ int main() {
 		cout << quad.at(i);
 	}
 
-	quad_output.close();
-	leader_output.close();
-	virtual_output.close();
+	quad_output_.close();
+	leader_output_.close();
+	virtual_output_.close();
 
 	return 0;
 }

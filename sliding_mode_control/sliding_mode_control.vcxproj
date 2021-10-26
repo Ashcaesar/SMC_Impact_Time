@@ -134,6 +134,7 @@
     <ClInclude Include="function.h" />
     <ClInclude Include="quadrotor.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="sliding_mode_control.h" />
     <ClInclude Include="target.h" />
   </ItemGroup>
   <ItemGroup>
