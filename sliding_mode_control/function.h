@@ -14,27 +14,7 @@ template<typename T> void write_data(ofstream& file, vector<T>& goal);
 coordinate transition(const coordinate& prev, const coordinate& base, const double& theta);
 
 //读取队形
-void read_form(ifstream& file, vector<coordinate>& form, int num_of_quad) {
-	if (!file) {
-		cerr << "输入文件打开失败！" << endl;
-		return;
-	}
-	string s;
-	double tmp;
-	stringstream sstream;
-	for (int i = 0; i < num_of_quad; ++i) {
-		getline(file, s);
-		sstream << s;
-		for (int j = 0; j < 2; ++j) {
-			sstream >> tmp;
-			if (j == 0) form[i].x = tmp;
-			else form[i].y = tmp;
-		}
-		sstream.clear();
-		sstream.str("");
-	}
-	file.close();
-}
+void read_form(ifstream& file, vector<coordinate>& form, int num_of_quad);
 
 //文件读取
 template<typename T> void read_data(ifstream& file, T& goal, int num_of_quad, int num_of_para) {
