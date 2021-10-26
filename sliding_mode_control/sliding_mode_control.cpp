@@ -23,6 +23,21 @@ extern const double rho = 0.6;
 
 using namespace std;
 
+ostream& operator<<(ostream& os, const Quadrotor& quad) {
+	os.precision(3);
+	os << "Quadrotor " << quad.getIndex() << " data:\n"
+		<< "Velocity =              [" << quad.getVel().x << "]\n"
+		<< "                        [" << quad.getVel().y << "]\n"
+		<< "Desired Impact Time =   [" << quad.getT_d_() << "]\n"
+		<< "Final Impact Time =     [" << quad.getT_d_() - quad.getT_go_() << "]\n"
+		<< "Desired Impact Angle =  [" << quad.getTHETA_d_() / PI * 180 << "]\n"
+		<< "Final Impact Angle =    [" << quad.getGamma() / PI * 180 << "]\n"
+		<< "**********************************"
+		<< endl;
+	os.precision();
+	return os;
+}
+
 int main() {
 	//int num;
 	//cout << "输入无人机数量:" << endl;
@@ -105,11 +120,12 @@ int main() {
 	//集结部分
 	double tmax = 0;
 	for (auto q : quad) {
-		tmax = max(tmax, q.getTd());
+		tmax = max(tmax, q.getT_d_());
 	}
 	for (double time = 0; time <= tmax; time += dt) {
+
 		for (int i = 0; i < num; ++i) {
-			if (quad.at(i).getRange() > 1) {
+			if (quad.at(i).getRange() > 3) {
 				quad.at(i).updateAcc(quad, num, time);
 				quad.at(i).updateState();
 				assemble.at(i).updateState();
@@ -122,10 +138,8 @@ int main() {
 		write_data(leader_output, leader);
 	}
 
-	/**/for (auto& q : quad) { q.setVelocity(0); }/**/
-
 	//编队飞行部分
-	/**/
+	/*
 	double t = 0;
 	for (double time = 0; time <= 200; time += dt) {
 		leader.at(0).updateState();
@@ -142,7 +156,7 @@ int main() {
 			for (auto q : quad) {
 				q.setTarget(virt.at(q.getIndex()));
 				q.updateTgo();
-				tmax = max(tmax, q.getTgo());
+				tmax = max(tmax, q.getT_go_());
 			}
 		}
 		//跟随目标
@@ -158,6 +172,10 @@ int main() {
 		t += dt;
 	}
 	/**/
+
+	for (int i = 0; i < num; ++i) {
+		cout << quad.at(i);
+	}
 
 	quad_output.close();
 	leader_output.close();

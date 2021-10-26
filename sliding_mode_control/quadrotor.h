@@ -17,15 +17,15 @@ private:
 	coordinate ACC;
 	double VELOCITY;
 	double ACCELERATION;
-	double ACCELERATION_Mn;
-	double ACCELERATION_Mt;
+	double ACCELERATION_Mn_;
+	double ACCELERATION_Mt_;
 	double GAMMA;
 	double THETA;
-	double THETA_M;
-	double THETA_d;
-	double e_THETA;
-	double Tgo;
-	double T_d;
+	double THETA_m_;
+	double THETA_d_;
+	double E_THETA_;
+	double T_go_;
+	double T_d_;
 	double RANGE;
 	double S1;
 	double S2;
@@ -33,7 +33,7 @@ private:
 	double nu;
 	double dnu(void);
 	double dnu(const double&);
-	double temp_dnu;
+	double temp_dnu_;
 	double dk2(double);
 
 public:	
@@ -50,8 +50,12 @@ public:
 	double getVelocity(void) const;
 	coordinate getAcc(void) const;
 	pair<double,double> getAccleration(void) const;
-	double getTgo(void) const;
-	double getTd(void) const;
+	double getT_go_(void) const;
+	double getT_d_(void) const;
+	double getGamma(void) const;
+	double getTHETA(void) const;
+	double getTHETA_d_(void) const;
+	double getE_THETA_(void) const;
 
 	//public set function
 	void setIndex(const int&);
@@ -73,5 +77,5 @@ public:
 	
 	double sign(const double&);
 	double phi(const double&);
-	double sgmf(const double&);
+	double sgmf(const double&);	
 };
