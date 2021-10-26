@@ -1,20 +1,22 @@
 #pragma once
 #include<stdlib.h>
-#include<fstream>
+#include<string>
 #include<vector>
-
+#include<iostream>
+#include<fstream>
+#include<sstream>
 #include"coordinate.h"
 
 using namespace std;
 
-template<typename T> void read_data(ifstream& file, T& goal, int num_of_quad, int num_of_para);
-template<typename T> void write_data(ofstream& file, vector<T>& goal);
-
-//计算旋转后坐标
+double sign(const double& x);
+double dnu(const double& alpha2, const double& S2);
+double dk2(const double& S1);
+void read_form(ifstream& file, vector<coordinate>& form, int num_of_quad);
 coordinate transition(const coordinate& prev, const coordinate& base, const double& theta);
 
-//读取队形
-void read_form(ifstream& file, vector<coordinate>& form, int num_of_quad);
+template<typename T> void read_data(ifstream& file, T& goal, int num_of_quad, int num_of_para);
+template<typename T> void write_data(ofstream& file, vector<T>& goal);
 
 //文件读取
 template<typename T> void read_data(ifstream& file, T& goal, int num_of_quad, int num_of_para) {
@@ -50,3 +52,5 @@ template<typename T> void write_data(ofstream& file, vector<T>& goal) {
 		file << g.getPos().x << " " << g.getPos().y << " " << g.getVel().x << " " << g.getVel().y << '\n';
 	}
 }
+
+

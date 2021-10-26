@@ -16,6 +16,7 @@ extern const double alpha1 = 0.45;
 extern const double alpha2 = 0.2;
 extern const double mu = 0.1;
 extern const double k1 = 0.5;
+extern const double k2_0 = 0.03;
 extern const double k2_bar = 1.5;
 extern const double lambda = 0.1;
 extern const double tau = 0.01;
@@ -97,7 +98,7 @@ int main() {
 	}
 
 	//编队飞行部分
-	/**/
+	/*
 	double t = 0.0;
 	for (double time = 0.0; time <= 200; time += dt) {
 		leader.at(0).updateState();

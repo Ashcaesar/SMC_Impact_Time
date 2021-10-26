@@ -31,10 +31,7 @@ private:
 	double S2;
 	Target target;
 	double nu;
-	double dnu(void);
-	double dnu(const double&);
-	double temp_dnu_;
-	double dk2(double);
+	double k2;
 
 public:	
 	Quadrotor(void);
@@ -62,7 +59,8 @@ public:
 	void setVelocity(const double&);
 	void setTarget(const Target&);
 	void setTd(const double&);
-
+	void resetNu(void);
+	void resetK2(void);
 	void updateRange(void);
 	void updateGamma(void);
 	void updateTheta(void);
@@ -72,10 +70,8 @@ public:
 	void updateAcc(vector<Quadrotor>&, const int&, const double&);
 	void updateTgo(void);
 	void updateState(void);
-	double integral_Nu(const double&, const double&, const double&);
-	double integral_k2(const double&, const double&, const double&);
-	
-	double sign(const double&);
+	double integral(double(*f)(const double&, const double&), const double&, const double&, double&, const double&);
+	double integral(double(*f)(const double&), const double&, double&, const double&);
 	double phi(const double&);
 	double sgmf(const double&);	
 };
