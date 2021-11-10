@@ -125,14 +125,14 @@
   <ItemGroup>
     <ClCompile Include="coordinate.cpp" />
     <ClCompile Include="function.cpp" />
-    <ClCompile Include="quadrotor.cpp" />
+    <ClCompile Include="uav.cpp" />
     <ClCompile Include="sliding_mode_control.cpp" />
     <ClCompile Include="target.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="coordinate.h" />
     <ClInclude Include="function.h" />
-    <ClInclude Include="quadrotor.h" />
+    <ClInclude Include="uav.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="sliding_mode_control.h" />
     <ClInclude Include="target.h" />

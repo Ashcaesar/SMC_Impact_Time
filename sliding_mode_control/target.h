@@ -9,6 +9,7 @@ class Target
 {
 private:
 	coordinate POS;
+	coordinate POS_TP;
 	coordinate VEL;
 
 	double VELOCITY;
@@ -18,19 +19,21 @@ public:
 	virtual ~Target();
 
 	//initial
-	virtual bool init(std::vector<double>& para);
-	virtual bool init(coordinate& para);
+	virtual bool init(std::vector<double>&);
+	virtual bool init(coordinate&);
 
 	//public get function
 	coordinate getPos(void) const;
+	coordinate getPos_TP(void) const;
 	coordinate getVel(void) const;
 	double getVelocity(void) const;
 	double getGamma(void) const;
 
 	//public set function
-	void setGamma(const double& para);
-	void setPos(const coordinate& para);
-	void setVel(const coordinate& para);
-	void setVelocity(const double& para);
+	void setGamma(const double&);
+	void setPos(const coordinate&);
+	void setPos_TP(const double&);
+	void setVel(const coordinate&);
+	void setVelocity(const double&);
 	void updateState(void);
 };

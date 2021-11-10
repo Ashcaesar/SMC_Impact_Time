@@ -25,9 +25,9 @@ bool Target::init(std::vector<double>& para) {
 	return true;
 }
 
-bool Target::init(coordinate& para) {
-	POS.x = para.x;
-	POS.y = para.y;
+bool Target::init(coordinate& pos) {
+	POS.x = pos.x;
+	POS.y = pos.y;
 	VELOCITY = 0;
 	GAMMA = 0;
 	VEL.x = 0;
@@ -37,6 +37,10 @@ bool Target::init(coordinate& para) {
 
 coordinate Target::getPos(void) const {
 	return POS;
+}
+
+coordinate Target::getPos_TP(void) const {
+	return POS_TP;
 }
 
 coordinate Target::getVel(void) const {
@@ -50,20 +54,24 @@ double Target::getVelocity(void) const {
 double Target::getGamma(void) const {
 	return GAMMA;
 }
-void Target::setGamma(const double& para) {
-	GAMMA = para;
+void Target::setGamma(const double& gamma) {
+	GAMMA = gamma;
 }
 
-void Target::setPos(const coordinate& para) {
-	POS = para;
+void Target::setPos(const coordinate& pos) {
+	POS = pos;
 }
 
-void Target::setVel(const coordinate& para) {
-	VEL = para;
+void Target::setPos_TP(const double& tgo) {
+	POS_TP = POS + VEL * tgo;
 }
 
-void Target::setVelocity(const double& para) {
-	VELOCITY = para;
+void Target::setVel(const coordinate& vel) {
+	VEL = vel;
+}
+
+void Target::setVelocity(const double& velocity) {
+	VELOCITY = velocity;
 }
 
 void Target::updateState(void) {
